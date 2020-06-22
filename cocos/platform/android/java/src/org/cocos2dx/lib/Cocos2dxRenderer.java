@@ -58,6 +58,19 @@ public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
     private long mFrameCount = 0;
     private boolean mNeedToPause = false;
 
+    // 慧知科技 开放游戏密钥配置
+    private String pass; // 游戏JS代码加密KEY
+
+    // 慧知科技
+    public String getPass() {
+        return pass;
+    }
+
+    public void setPass(String pass) {
+        this.pass = pass;
+    }
+    
+
     // ===========================================================
     // Constructors
     // ===========================================================
@@ -102,7 +115,7 @@ public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceCreated(final GL10 GL10, final EGLConfig EGLConfig) {
         mNativeInitCompleted = false;
-        Cocos2dxRenderer.nativeInit(this.mScreenWidth, this.mScreenHeight, mDefaultResourcePath);
+        Cocos2dxRenderer.nativeInit(this.mScreenWidth, this.mScreenHeight, pass, mDefaultResourcePat);
         mOldNanoTime = System.nanoTime();
         this.mLastTickInNanoSeconds = System.nanoTime();
         mNativeInitCompleted = true;

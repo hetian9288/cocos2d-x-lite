@@ -60,4 +60,132 @@ public class Utils {
                     parameters);
         }
     }
+
+    // 生成小游戏的根目录路径
+    public static File getMingameRootPath(Cocos2dxActivity activity) {
+        return getMingameRootPath(activity, activity.getAppid());
+    }
+
+    // 生成小游戏的根目录路径
+    public static File getMingameRootPath(Context context, String appid) {
+        String path = context.getFilesDir().getAbsolutePath();
+        int lastSlash = path.lastIndexOf("/");
+        String rootPath = path.substring(0, lastSlash + 1);
+        File rootDir = new File(rootPath + "/plugins/mingame/" + appid);
+        if (!rootDir.exists()) {
+            rootDir.mkdirs();
+        }
+        return rootDir;
+    }
+
+    // 在小游戏的根目录下生成一个目录
+    public static File mingamePathMkdir(Cocos2dxActivity context, String dirName) {
+        String appid = context.getAppid();
+        return mingamePathMkdir(context, appid, dirName);
+    }
+
+    // 在小游戏的根目录下生成一个目录
+    public static File mingamePathMkdir(Cocos2dxActivity context, String appid, String dirName) {
+        if (FileUtil.isDiskAvailable()) {
+            File rootPath = getMingameRootPath(context, appid);
+            rootPath = new File(rootPath, dirName);
+            if (rootPath.exists() || rootPath.mkdirs()) {
+                return rootPath;
+            }
+        }
+
+        return null;
+    }
+
+    // 小游戏源码目录
+    public static File mingameSourcePath(Cocos2dxActivity context) {
+        return mingamePathMkdir(context, "source");
+    }
+
+    public static File mingameSourcePath(Cocos2dxActivity context, String appid) {
+        return mingamePathMkdir(context, appid, "source");
+    }
+
+    public static String mingameSourceJoinPath(Cocos2dxActivity context, String path) {
+        String sourcePath = mingamePathMkdir(context, "source").getAbsolutePath();
+        if (path.startsWith("/")) {
+            return sourcePath + path;
+        }
+        return sourcePath + "/" + path;
+    }
+
+    // 源码目录创建文件夹
+    public static File mingameSourceMkdir(Cocos2dxActivity context, String dirName) {
+        File root = mingameSourcePath(context);
+        File newDir = new File(root, dirName);
+        if (newDir.exists() || newDir.mkdirs()) {
+            return newDir;
+        }
+        return null;
+    }
+
+    public static File mingameSourceMkdir(Cocos2dxActivity context, String appid, String dirName) {
+        File root = mingameSourcePath(context, appid);
+        File newDir = new File(root, dirName);
+        if (newDir.exists() || newDir.mkdirs()) {
+            return newDir;
+        }
+        return null;
+    }
+
+    // 小游戏缓存目录
+    public static File mingameCachePath(Cocos2dxActivity context) {
+        return mingamePathMkdir(context, "caches");
+    }
+
+    public static File mingameCachePath(Cocos2dxActivity context, String appid) {
+        return mingamePathMkdir(context, appid, "caches");
+    }
+
+    // 缓存目录创建文件夹
+    public static File mingameCacheMkdir(Cocos2dxActivity context, String dirName) {
+        File root = mingameCachePath(context);
+        File newDir = new File(root, dirName);
+        if (newDir.exists() || newDir.mkdirs()) {
+            return newDir;
+        }
+        return null;
+    }
+
+    public static File mingameCacheMkdir(Cocos2dxActivity context, String appid, String dirName) {
+        File root = mingameCachePath(context, appid);
+        File newDir = new File(root, dirName);
+        if (newDir.exists() || newDir.mkdirs()) {
+            return newDir;
+        }
+        return null;
+    }
+
+    // 小程序数据目录
+    public static File mingameDBPath(Cocos2dxActivity context) {
+        return mingamePathMkdir(context, "databases");
+    }
+
+    public static File mingameDBPath(Cocos2dxActivity context, String appid) {
+        return mingamePathMkdir(context, appid, "databases");
+    }
+
+    // 数据目录创建目录
+    public static File mimappDBMkdir(Cocos2dxActivity context, String dirName) {
+        File root = mingameDBPath(context);
+        File newDir = new File(root, dirName);
+        if (newDir.exists() || newDir.mkdirs()) {
+            return newDir;
+        }
+        return null;
+    }
+
+    public static File mingameDBMkdir(Cocos2dxActivity context, String appid, String dirName) {
+        File root = mingameDBPath(context, appid);
+        File newDir = new File(root, dirName);
+        if (newDir.exists() || newDir.mkdirs()) {
+            return newDir;
+        }
+        return null;
+    }
 }

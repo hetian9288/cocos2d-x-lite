@@ -88,6 +88,21 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
     private TextView mGameInfoTextView_2;
     // DEBUG VIEW END
 
+    // 慧知科技 开放游戏初始配置
+    // 继承该类的时候需要初始化这两个参数
+    protected String gamePath; // 游戏缓存路径
+    protected String pass; // 游戏JS代码加密KEY
+    protected String appid; // 应用ID
+    private static CocosContext cocosContext;
+    public static CocosContext getCocosContext() {
+        return cocosContext;
+    }
+
+    public String getAppid() {
+        return appid;
+    }
+    // END
+
     // ===========================================================
     // Inner class
     // ===========================================================
@@ -260,7 +275,13 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
         mFrameLayout = new FrameLayout(this);
         mFrameLayout.setLayoutParams(frameLayoutParams);
 
+        // 慧知科技 整合配置
+        assert gamePath != null;
+        assert pass != null;
+        assert appid != null;
         Cocos2dxRenderer renderer = this.addSurfaceView();
+        renderer.setDefaultResourcePath(gamePath);
+        renderer.setPass(pass);
         this.addDebugInfo(renderer);
 
 
