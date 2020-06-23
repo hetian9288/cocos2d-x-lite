@@ -894,18 +894,24 @@ const std::string& FileUtils::getDefaultResourceRootPath() const
     return _defaultResRootPath;
 }
 
+const std::string& FileUtils::getSourcePath() const 
+{
+
+}
+
+// 小游戏初始化时该处传入的时小程序私有根目录
+// 此处需要将 /source /caches 目录的搜索
 void FileUtils::setDefaultResourceRootPath(const std::string& path)
 {
-    if (_defaultResRootPath != path)
-    {
+    if (_defaultRootPath != path) {
         _fullPathCache.clear();
-        _defaultResRootPath = path;
-        if (!_defaultResRootPath.empty() && _defaultResRootPath[_defaultResRootPath.length()-1] != '/')
+        _defaultRootPath = path;
+        if (!_defaultRootPath.empty() && _defaultRootPath[_defaultRootPath.length()-1] != '/')
         {
-            _defaultResRootPath += '/';
+            _defaultSourceRootPath = _defaultRootPath + '/source';
+            _defaultCachesRootPath = _defaultRootPath + '/caches';
         }
 
-        // Updates search paths
         setSearchPaths(_originalSearchPaths);
     }
 }
@@ -913,6 +919,7 @@ void FileUtils::setDefaultResourceRootPath(const std::string& path)
 void FileUtils::setSearchPaths(const std::vector<std::string>& searchPaths)
 {
     bool existDefaultRootPath = false;
+    bool existCachesRootPath = false;
     _originalSearchPaths = searchPaths;
 
     _fullPathCache.clear();
@@ -936,6 +943,10 @@ void FileUtils::setSearchPaths(const std::vector<std::string>& searchPaths)
         {
             existDefaultRootPath = true;
         }
+        if (!existCachesRootPath && path == _defaultCachesRootPath)
+        {
+            existCachesRootPath = true;
+        }
         _searchPathArray.push_back(fullPath);
     }
 
@@ -943,6 +954,9 @@ void FileUtils::setSearchPaths(const std::vector<std::string>& searchPaths)
     {
         //CCLOG("Default root path doesn't exist, adding it.");
         _searchPathArray.push_back(_defaultResRootPath);
+    }
+    if (!existCachesRootPath) {
+        _searchPathArray.push_back(_defaultCachesRootPath);
     }
 }
 

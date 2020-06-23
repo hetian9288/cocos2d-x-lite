@@ -753,6 +753,11 @@ protected:
      */
     std::string _defaultResRootPath;
 
+    // 慧知科技新增
+    std::string _defaultRootPath;
+    std::string _defaultSourceRootPath;
+    std::string _defaultCachesRootPath;
+
     /**
      *  The full path cache. When a file is found, it will be added into this cache.
      *  This variable is used for improving the performance of file search.
