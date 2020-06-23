@@ -104,12 +104,20 @@ public class Cocos2dxHttpURLConnection
 
         try {
             InputStream caInput = null;
+            String assetString = "@assets/";
+            String cachesString = "@caches/";
             if (sslFilename.startsWith("/")) {
                 caInput = new BufferedInputStream(new FileInputStream(sslFilename));
-            }else {
-                final String assetString = "@assets/";
-                final String assetsfilenameString = sslFilename.substring(assetString.length());
-                caInput = new BufferedInputStream(Cocos2dxHelper.getActivity().getAssets().open(assetsfilenameString));
+            }else if(sslFilename.startsWith(assetString)){
+                String assetsfilenameString = sslFilename.substring(assetString.length());
+                assetsfilenameString = Utils.mingameSourceJoinPath(SharedVisit.gameActivity, assetsfilenameString);
+                FileInputStream fs = new FileInputStream(assetsfilenameString);
+                caInput = new BufferedInputStream(fs);
+            } else if (sslFilename.startsWith(cachesString)) {
+                String filenameString = sslFilename.substring(cachesString.length());
+                filenameString = Utils.mingameCacheJoinPath(SharedVisit.gameActivity, filenameString);
+                FileInputStream fs = new FileInputStream(filenameString);
+                caInput = new BufferedInputStream(fs);
             }
 
             final CertificateFactory cf = CertificateFactory.getInstance("X.509");

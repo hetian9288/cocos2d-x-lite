@@ -137,10 +137,14 @@ public class CanvasRenderingContext2DImpl {
                 Typeface typeface = null;
                 // 删除了加载绝对链接资源，强制要求只能加载私有目录资源
                 if (sContext.get() != null) {
-                    final String prefix = "@assets/";
-                    if (url.startsWith(prefix)) {
-                        url = url.substring(prefix.length());
-                        url = Utils.mingameSourcePath(SharedVisit.gameActivity).getAbsolutePath() + "/" + url;
+                    final String accessPrefix = "@assets/";
+                    final String cachePrefix = "@caches/";
+                    if (url.startsWith(accessPrefix)) {
+                        url = url.substring(accessPrefix.length());
+                        url = Utils.mingameSourceJoinPath(SharedVisit.gameActivity, url);
+                    } else if (url.startsWith(cachePrefix)) {
+                        url = url.substring(cachePrefix.length());
+                        url = Utils.mingameCacheJoinPath(SharedVisit.gameActivity, url);
                     }
                     typeface = Typeface.createFromFile(url);
                 }
