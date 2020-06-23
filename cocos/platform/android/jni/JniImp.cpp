@@ -469,13 +469,11 @@ extern "C"
         g_apkPath = JniHelper::jstring2string(apkPath);
     }
 
-    // 慧知科技删除 取消 jobject context
-    // JNIEXPORT void JNICALL JNI_HELPER(nativeSetContext)(JNIEnv*  env, jobject thiz, jobject context)
-    JNIEXPORT void JNICALL JNI_HELPER(nativeSetContext)(JNIEnv*  env, jobject thiz)
+    
+    JNIEXPORT void JNICALL JNI_HELPER(nativeSetContext)(JNIEnv*  env, jobject thiz, jobject context)
     {
         JniHelper::setClassLoaderFrom(context);
-        // 慧知科技 删除
-        // FileUtilsAndroid::setassetmanager(AAssetManager_fromJava(env, assetManager));
+        FileUtilsAndroid::setassetmanager(AAssetManager_fromJava(env, assetManager));
     }
 
     JNIEXPORT void JNICALL JNI_HELPER(nativeSetAudioDeviceInfo)(JNIEnv*  env, jobject thiz, jboolean isSupportLowLatency, jint deviceSampleRate, jint deviceAudioBufferSizeInFrames)
