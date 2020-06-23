@@ -423,6 +423,11 @@ public:
      */
     const std::string& getDefaultResourceRootPath() const;
 
+
+    const std::string& getDefaultCachesRootPath() const;
+    const std::string& getDefaultRootPath() const;
+    const std::string& getDefaultSourceRootPath() const;
+
     /**
      * Set default resource root path.
      */

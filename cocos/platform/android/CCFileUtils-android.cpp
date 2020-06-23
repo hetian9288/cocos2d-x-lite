@@ -53,13 +53,13 @@ ZipFile *FileUtilsAndroid::obbfile = nullptr;
 
 void FileUtilsAndroid::setassetmanager(AAssetManager *a)
 {
-    // 慧知科技删除 不再对 asset 目录读取
-    // if (nullptr == a) {
-    //     LOGD("setassetmanager : received unexpected nullptr parameter");
-    //     return;
-    // }
+    if (nullptr == a)
+    {
+        LOGD("setassetmanager : received unexpected nullptr parameter");
+        return;
+    }
 
-    // cocos2d::FileUtilsAndroid::assetmanager = a;
+    cocos2d::FileUtilsAndroid::assetmanager = a;
 }
 
 FileUtils *FileUtils::getInstance()
@@ -200,12 +200,12 @@ bool FileUtilsAndroid::isFileExistInternal(const std::string &strFilePath) const
         if (dirPath.find(ASSETS_FOLDER_NAME) == 0)
         {
             str += strlen(ASSETS_FOLDER_NAME);
-            newFilePath = _defaultResRootPath + '/' + str;
+            newFilePath = FileUtils::normalizePath(_defaultSourceRootPath + '/' + str);
         }
         else if (dirPath.find(CACHES_FOLDER_NAME) == 0)
         {
             str += strlen(CACHES_FOLDER_NAME);
-            newFilePath = _defaultCachesRootPath + '/' + str;
+            newFilePath = FileUtils::normalizePath(_defaultCachesRootPath + '/' + str);
         }
 
         if (!newFilePath.empty())
@@ -265,12 +265,12 @@ bool FileUtilsAndroid::isDirectoryExistInternal(const std::string &dirPath_) con
         if (dirPath.find(ASSETS_FOLDER_NAME) == 0)
         {
             str += strlen(ASSETS_FOLDER_NAME);
-            newFilePath = _defaultResRootPath + '/' + str;
+            newFilePath = FileUtils::normalizePath(_defaultSourceRootPath + '/' + str);
         }
         else if (dirPath.find(CACHES_FOLDER_NAME) == 0)
         {
             str += strlen(CACHES_FOLDER_NAME);
-            newFilePath = _defaultCachesRootPath + '/' + str;
+            newFilePath = FileUtils::normalizePath(_defaultCachesRootPath + '/' + str);
         }
 
         if (!newFilePath.empty())
@@ -318,21 +318,20 @@ FileUtils::Status FileUtilsAndroid::getContents(const std::string &filename, Res
     {
         // "@assets/" is at the beginning of the path and we don't want it
         str += strlen(ASSETS_FOLDER_NAME);
-        absolutePath = _defaultResRootPath + "/" + str;
+        absolutePath = FileUtils::normalizePath(_defaultSourceRootPath + "/" + str);
     }
     else if (0 == fullPath.find(CACHES_FOLDER_NAME))
     {
         // "@caches/" is at the beginning of the path and we don't want it
         str += strlen(CACHES_FOLDER_NAME);
-        absolutePath = _defaultCachesRootPath + "/" + str;
+        absolutePath = FileUtils::normalizePath(_defaultCachesRootPath + "/" + str);
     }
-    else
+
+    if (!absolutePath.empty())
     {
-        relativePath = fullPath;
+        return FileUtils::getContents(absolutePath, buffer);
     }
-
-    return FileUtils::getContents(fullPath, buffer);
-
+    return FileUtils::Status::NotExists;
     // 慧知科技 删除安装包查询
     // if (obbfile)
     // {
