@@ -36,10 +36,11 @@ THE SOFTWARE.
 #include <stdlib.h>
 #include <sys/stat.h>
 
-#define  LOG_TAG    "CCFileUtils-android.cpp"
-#define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
+#define LOG_TAG "CCFileUtils-android.cpp"
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 
-#define  ASSETS_FOLDER_NAME          "@assets/"
+#define ASSETS_FOLDER_NAME "@assets/"
+#define CACHES_FOLDER_NAME "@caches/"
 
 #ifndef JCLS_HELPER
 #define JCLS_HELPER "org/cocos2dx/lib/Cocos2dxHelper"
@@ -47,28 +48,30 @@ THE SOFTWARE.
 
 NS_CC_BEGIN
 
-AAssetManager* FileUtilsAndroid::assetmanager = nullptr;
-ZipFile* FileUtilsAndroid::obbfile = nullptr;
+AAssetManager *FileUtilsAndroid::assetmanager = nullptr;
+ZipFile *FileUtilsAndroid::obbfile = nullptr;
 
-void FileUtilsAndroid::setassetmanager(AAssetManager* a) {
-    if (nullptr == a) {
-        LOGD("setassetmanager : received unexpected nullptr parameter");
-        return;
-    }
+void FileUtilsAndroid::setassetmanager(AAssetManager *a)
+{
+    // 慧知科技删除 不再对 asset 目录读取
+    // if (nullptr == a) {
+    //     LOGD("setassetmanager : received unexpected nullptr parameter");
+    //     return;
+    // }
 
-    cocos2d::FileUtilsAndroid::assetmanager = a;
+    // cocos2d::FileUtilsAndroid::assetmanager = a;
 }
 
-FileUtils* FileUtils::getInstance()
+FileUtils *FileUtils::getInstance()
 {
     if (s_sharedFileUtils == nullptr)
     {
         s_sharedFileUtils = new FileUtilsAndroid();
         if (!s_sharedFileUtils->init())
         {
-          delete s_sharedFileUtils;
-          s_sharedFileUtils = nullptr;
-          CCLOG("ERROR: Could not init CCFileUtilsAndroid");
+            delete s_sharedFileUtils;
+            s_sharedFileUtils = nullptr;
+            CCLOG("ERROR: Could not init CCFileUtilsAndroid");
         }
     }
     return s_sharedFileUtils;
@@ -90,12 +93,13 @@ FileUtilsAndroid::~FileUtilsAndroid()
 bool FileUtilsAndroid::init()
 {
     _defaultResRootPath = ASSETS_FOLDER_NAME;
-    
-    std::string assetsPath(getApkPathJNI());
-    if (assetsPath.find("/obb/") != std::string::npos)
-    {
-        obbfile = new ZipFile(assetsPath);
-    }
+
+    // 慧知科技删除此处对apk包的读取
+    // std::string assetsPath(getApkPathJNI());
+    // if (assetsPath.find("/obb/") != std::string::npos)
+    // {
+    //     obbfile = new ZipFile(assetsPath);
+    // }
 
     return FileUtils::init();
 }
@@ -124,17 +128,19 @@ std::string FileUtilsAndroid::getNewFilename(const std::string &filename) const
         {
             tmp = newFileName.substr(idx, size - idx);
             noexit = false;
-        }else
+        }
+        else
         {
             tmp = newFileName.substr(idx, pos - idx + 1);
         }
         auto t = v.size();
-        if (t > 0 && v[t-1].compare("../") != 0 &&
-             (tmp.compare("../") == 0 || tmp.compare("..") == 0))
+        if (t > 0 && v[t - 1].compare("../") != 0 &&
+            (tmp.compare("../") == 0 || tmp.compare("..") == 0))
         {
             v.pop_back();
             change = true;
-        }else
+        }
+        else
         {
             v.push_back(tmp);
         }
@@ -152,7 +158,7 @@ std::string FileUtilsAndroid::getNewFilename(const std::string &filename) const
     return newFileName;
 }
 
-bool FileUtilsAndroid::isFileExistInternal(const std::string& strFilePath) const
+bool FileUtilsAndroid::isFileExistInternal(const std::string &strFilePath) const
 {
     if (strFilePath.empty())
     {
@@ -161,26 +167,54 @@ bool FileUtilsAndroid::isFileExistInternal(const std::string& strFilePath) const
 
     bool bFound = false;
 
+    // 慧知科技 删除 不再对apk包与asset目录进行查找
     // Check whether file exists in apk.
+    // if (strFilePath[0] != '/')
+    // {
+    //     const char* s = strFilePath.c_str();
+
+    //     // Found "@assets/" at the beginning of the path and we don't want it
+    //     if (strFilePath.find(ASSETS_FOLDER_NAME) == 0) s += strlen(ASSETS_FOLDER_NAME);
+    //     if (obbfile && obbfile->fileExists(s))
+    //     {
+    //         bFound = true;
+    //     }
+    //     else if (FileUtilsAndroid::assetmanager)
+    //     {
+    //         AAsset* aa = AAssetManager_open(FileUtilsAndroid::assetmanager, s, AASSET_MODE_UNKNOWN);
+    //         if (aa)
+    //         {
+    //             bFound = true;
+    //             AAsset_close(aa);
+    //         } else {
+    //             // CCLOG("[AssetManager] ... in APK %s, found = false!", strFilePath.c_str());
+    //         }
+    //     }
+    // }
+    // 慧知科技添加 对@assets/ @caches/ 的处理
     if (strFilePath[0] != '/')
     {
-        const char* s = strFilePath.c_str();
+        const char *str = strFilePath.c_str();
 
-        // Found "@assets/" at the beginning of the path and we don't want it
-        if (strFilePath.find(ASSETS_FOLDER_NAME) == 0) s += strlen(ASSETS_FOLDER_NAME);
-        if (obbfile && obbfile->fileExists(s))
+        std::string newFilePath;
+        if (dirPath.find(ASSETS_FOLDER_NAME) == 0)
         {
-            bFound = true;
+            str += strlen(ASSETS_FOLDER_NAME);
+            newFilePath = _defaultResRootPath + '/' + str;
         }
-        else if (FileUtilsAndroid::assetmanager)
+        else if (dirPath.find(CACHES_FOLDER_NAME) == 0)
         {
-            AAsset* aa = AAssetManager_open(FileUtilsAndroid::assetmanager, s, AASSET_MODE_UNKNOWN);
-            if (aa)
+            str += strlen(CACHES_FOLDER_NAME);
+            newFilePath = _defaultCachesRootPath + '/' + str;
+        }
+
+        if (!newFilePath.empty())
+        {
+            FILE *fp = fopen(strFilePath.c_str(), "r");
+            if (fp)
             {
                 bFound = true;
-                AAsset_close(aa);
-            } else {
-                // CCLOG("[AssetManager] ... in APK %s, found = false!", strFilePath.c_str());
+                fclose(fp);
             }
         }
     }
@@ -196,7 +230,7 @@ bool FileUtilsAndroid::isFileExistInternal(const std::string& strFilePath) const
     return bFound;
 }
 
-bool FileUtilsAndroid::isDirectoryExistInternal(const std::string& dirPath_) const
+bool FileUtilsAndroid::isDirectoryExistInternal(const std::string &dirPath_) const
 {
     if (dirPath_.empty())
     {
@@ -224,26 +258,35 @@ bool FileUtilsAndroid::isDirectoryExistInternal(const std::string& dirPath_) con
         // find it in apk's assets dir
         // Found "@assets/" at the beginning of the path and we don't want it
         CCLOG("find in apk dirPath(%s)", dirPath.c_str());
-        const char* s = dirPath.c_str();
-        if (dirPath.find(_defaultResRootPath) == 0)
+
+        const char *str = strFilePath.c_str();
+
+        std::string newFilePath;
+        if (dirPath.find(ASSETS_FOLDER_NAME) == 0)
         {
-            s += _defaultResRootPath.length();
+            str += strlen(ASSETS_FOLDER_NAME);
+            newFilePath = _defaultResRootPath + '/' + str;
         }
-        if (FileUtilsAndroid::assetmanager)
+        else if (dirPath.find(CACHES_FOLDER_NAME) == 0)
         {
-            AAssetDir* aa = AAssetManager_openDir(FileUtilsAndroid::assetmanager, s);
-            if (aa && AAssetDir_getNextFileName(aa))
+            str += strlen(CACHES_FOLDER_NAME);
+            newFilePath = _defaultCachesRootPath + '/' + str;
+        }
+
+        if (!newFilePath.empty())
+        {
+            struct stat st;
+            if (stat(newFilePath.c_str(), &st) == 0)
             {
-                AAssetDir_close(aa);
-                return true;
+                return S_ISDIR(st.st_mode);
             }
         }
     }
-    
+
     return false;
 }
 
-bool FileUtilsAndroid::isAbsolutePath(const std::string& strPath) const
+bool FileUtilsAndroid::isAbsolutePath(const std::string &strPath) const
 {
     // On Android, there are two situations for full path.
     // 1) Files in APK, e.g. assets/path/path/file.png
@@ -256,7 +299,7 @@ bool FileUtilsAndroid::isAbsolutePath(const std::string& strPath) const
     return false;
 }
 
-FileUtils::Status FileUtilsAndroid::getContents(const std::string& filename, ResizableBuffer* buffer)
+FileUtils::Status FileUtilsAndroid::getContents(const std::string &filename, ResizableBuffer *buffer)
 {
     if (filename.empty())
         return FileUtils::Status::NotExists;
@@ -268,45 +311,58 @@ FileUtils::Status FileUtilsAndroid::getContents(const std::string& filename, Res
     if (fullPath[0] == '/')
         return FileUtils::getContents(fullPath, buffer);
 
-    std::string relativePath;
-    size_t position = fullPath.find(ASSETS_FOLDER_NAME);
-    if (0 == position) {
+    const char *str = fullPath.c_str();
+    std::string absolutePath;
+
+    if (0 == fullPath.find(ASSETS_FOLDER_NAME))
+    {
         // "@assets/" is at the beginning of the path and we don't want it
-        relativePath += fullPath.substr(strlen(ASSETS_FOLDER_NAME));
-    } else {
+        str += strlen(ASSETS_FOLDER_NAME);
+        absolutePath = _defaultResRootPath + "/" + str;
+    }
+    else if (0 == fullPath.find(CACHES_FOLDER_NAME))
+    {
+        // "@caches/" is at the beginning of the path and we don't want it
+        str += strlen(CACHES_FOLDER_NAME);
+        absolutePath = _defaultCachesRootPath + "/" + str;
+    }
+    else
+    {
         relativePath = fullPath;
     }
 
-    if (obbfile)
-    {
-        if (obbfile->getFileData(relativePath, buffer))
-            return FileUtils::Status::OK;
-    }
+    return FileUtils::getContents(fullPath, buffer);
 
-    if (nullptr == assetmanager) {
-        LOGD("... FileUtilsAndroid::assetmanager is nullptr");
-        return FileUtils::Status::NotInitialized;
-    }
+    // 慧知科技 删除安装包查询
+    // if (obbfile)
+    // {
+    //     if (obbfile->getFileData(relativePath, buffer))
+    //         return FileUtils::Status::OK;
+    // }
 
-    AAsset* asset = AAssetManager_open(assetmanager, relativePath.data(), AASSET_MODE_UNKNOWN);
-    if (nullptr == asset) {
-        LOGD("asset (%s) is nullptr", filename.c_str());
-        return FileUtils::Status::OpenFailed;
-    }
+    // 慧知科技 此处删除了 asset 目录查找
+    // if (nullptr == assetmanager) {
+    //     LOGD("... FileUtilsAndroid::assetmanager is nullptr");
+    //     return FileUtils::Status::NotInitialized;
+    // }
 
-    auto size = AAsset_getLength(asset);
-    buffer->resize(size);
+    // AAsset* asset = AAssetManager_open(assetmanager, relativePath.data(), AASSET_MODE_UNKNOWN);
+    // if (nullptr == asset) {
+    //     LOGD("asset (%s) is nullptr", filename.c_str());
+    //     return FileUtils::Status::OpenFailed;
+    // }
 
-    int readsize = AAsset_read(asset, buffer->buffer(), size);
-    AAsset_close(asset);
+    // auto size = AAsset_getLength(asset);
+    // buffer->resize(size);
 
-    if (readsize < size) {
-        if (readsize >= 0)
-            buffer->resize(readsize);
-        return FileUtils::Status::ReadFailed;
-    }
+    // int readsize = AAsset_read(asset, buffer->buffer(), size);
+    // AAsset_close(asset);
 
-    return FileUtils::Status::OK;
+    // if (readsize < size) {
+    //     if (readsize >= 0)
+    //         buffer->resize(readsize);
+    //     return FileUtils::Status::ReadFailed;
+    // }
 }
 
 std::string FileUtilsAndroid::getWritablePath() const
