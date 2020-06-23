@@ -161,6 +161,14 @@ public class Utils {
         return null;
     }
 
+    public static String mingameCacheJoinPath(Cocos2dxActivity context, String path) {
+        String cachePath = mingameCachePath(context).getAbsolutePath();
+        if (path.startsWith("/")) {
+            return cachePath + path;
+        }
+        return cachePath + "/" + path;
+    }
+
     // 小程序数据目录
     public static File mingameDBPath(Cocos2dxActivity context) {
         return mingamePathMkdir(context, "databases");
