@@ -423,6 +423,11 @@ public:
      */
     const std::string& getDefaultResourceRootPath() const;
 
+
+    const std::string& getDefaultCachesRootPath() const;
+    const std::string& getDefaultRootPath() const;
+    const std::string& getDefaultSourceRootPath() const;
+
     /**
      * Set default resource root path.
      */
@@ -752,6 +757,11 @@ protected:
      *  Similarly on Blackberry, we assign "app/native/Resources/" to this variable in FileUtilsBlackberry::init().
      */
     std::string _defaultResRootPath;
+
+    // 慧知科技新增
+    std::string _defaultRootPath;
+    std::string _defaultSourceRootPath;
+    std::string _defaultCachesRootPath;
 
     /**
      *  The full path cache. When a file is found, it will be added into this cache.

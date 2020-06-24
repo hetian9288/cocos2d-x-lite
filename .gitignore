@@ -164,6 +164,7 @@ tests/cpp-tests/Resources/audio
 /tools/simulator/runtime/win32
 /tools/simulator/simulator
 
-
 cocos2d-x-lite-external-*
-*.zip
+next*.zip
+cocos/platform/android/libcocos2dx/.project
+cocos/platform/android/libcocos2dx/.settings/org.eclipse.buildship.core.prefs

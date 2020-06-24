@@ -61,6 +61,7 @@ public class Cocos2dxVideoView extends SurfaceView {
     // Constants
     // ===========================================================
     private static final String AssetResourceRoot = "@assets/";
+    private static final String CacheResourceRoot = "@caches/";
 
     // ===========================================================
     // Fields
@@ -164,17 +165,12 @@ public class Cocos2dxVideoView extends SurfaceView {
 
     public void setVideoFileName(String path) {
         if (path.startsWith(AssetResourceRoot)) {
-            path = path.substring(AssetResourceRoot.length());
-        }
-
-        if (path.startsWith("/")) {
+            path = Utils.mingameSourceJoinPath(SharedVisit.gameActivity, path.substring(AssetResourceRoot.length()));
             mIsAssetRouse = false;
-            setVideoURI(Uri.parse(path),null);
-        }
-        else {
-
-            mVideoFilePath = path;
-            mIsAssetRouse = true;
+            setVideoURI(Uri.parse(path), null);
+        } else if (path.startsWith(CacheResourceRoot)) {
+            path = Utils.mingameSourceJoinPath(SharedVisit.gameActivity, path.substring(CacheResourceRoot.length()));
+            mIsAssetRouse = false;
             setVideoURI(Uri.parse(path), null);
         }
     }
@@ -415,10 +411,8 @@ public class Cocos2dxVideoView extends SurfaceView {
             mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mMediaPlayer.setScreenOnWhilePlaying(true);
 
-            if (mIsAssetRouse) {
-                AssetFileDescriptor afd = mCocos2dxActivity.getAssets().openFd(mVideoFilePath);
-                mMediaPlayer.setDataSource(afd.getFileDescriptor(),afd.getStartOffset(),afd.getLength());
-            } else {
+            
+            if (!mIsAssetRouse) {
                 mMediaPlayer.setDataSource(mVideoUri.toString());
             }
             mCurrentState = State.INITIALIZED;

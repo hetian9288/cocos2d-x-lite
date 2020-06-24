@@ -60,14 +60,20 @@ public class Cocos2dxTypefaces {
     public static synchronized Typeface get(final Context context, final String assetName) {
         if (!Cocos2dxTypefaces.sTypefaceCache.containsKey(assetName)) {
             Typeface typeface = null;
-            if (assetName.startsWith("/"))
-            {
-                typeface = Typeface.createFromFile(assetName);
+
+            // 删除了加载绝对链接资源，强制要求只能加载私有目录资源
+            final String accessPrefix = "@assets/";
+            final String cachePrefix = "@caches/";
+            if (url.startsWith(accessPrefix)) {
+                url = url.substring(accessPrefix.length());
+                url = Utils.mingameSourceJoinPath(SharedVisit.gameActivity, url);
+                typeface = Typeface.createFromFile(url);
+            } else if (url.startsWith(cachePrefix)) {
+                url = url.substring(cachePrefix.length());
+                url = Utils.mingameCacheJoinPath(SharedVisit.gameActivity, url);
+                typeface = Typeface.createFromFile(url);
             }
-            else
-            {
-                typeface = Typeface.createFromAsset(context.getAssets(), assetName);
-            }
+
             Cocos2dxTypefaces.sTypefaceCache.put(assetName, typeface);
         }
 

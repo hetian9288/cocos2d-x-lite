@@ -185,9 +185,14 @@ public:
     void copyTextToClipboard(const std::string &text);
 
     std::string getSystemVersion();
+
+    // 慧知科技
+    void setPass(const std::string& pass);
+    std::string getPass();
     
 protected:
     virtual void onCreateView(PixelFormat& pixelformat, DepthFormat& depthFormat, int& multisamplingCount);
+    std::string _pass;
     
 private:
     void createView(const std::string& name, int width, int height);

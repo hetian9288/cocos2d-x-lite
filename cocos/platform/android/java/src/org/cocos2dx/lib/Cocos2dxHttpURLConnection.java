@@ -60,7 +60,7 @@ public class Cocos2dxHttpURLConnection
     private static final String POST_METHOD = "POST" ;
     private static final String PUT_METHOD = "PUT" ;
 
-    static HttpURLConnection createHttpURLConnection(String linkURL) {
+    static HttpURLConnection createHttpURLConnection(final String linkURL) {
         URL url;
         HttpURLConnection urlConnection;
         try {
@@ -69,7 +69,7 @@ public class Cocos2dxHttpURLConnection
             //Accept-Encoding
             urlConnection.setRequestProperty("Accept-Encoding", "identity");
             urlConnection.setDoInput(true);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             Log.e(TAG, "createHttpURLConnection:" + e.toString());
             return null;
@@ -78,79 +78,87 @@ public class Cocos2dxHttpURLConnection
         return urlConnection;
     }
 
-    static void setReadAndConnectTimeout(HttpURLConnection urlConnection, int readMiliseconds, int connectMiliseconds) {
+    static void setReadAndConnectTimeout(final HttpURLConnection urlConnection, final int readMiliseconds, final int connectMiliseconds) {
         urlConnection.setReadTimeout(readMiliseconds);
         urlConnection.setConnectTimeout(connectMiliseconds);
     }
 
-    static void setRequestMethod(HttpURLConnection urlConnection, String method){
+    static void setRequestMethod(final HttpURLConnection urlConnection, final String method){
         try {
             urlConnection.setRequestMethod(method);
             if(method.equalsIgnoreCase(POST_METHOD) || method.equalsIgnoreCase(PUT_METHOD)) {
                 urlConnection.setDoOutput(true);
             }
-        } catch (ProtocolException e) {
+        } catch (final ProtocolException e) {
             Log.e(TAG, "setRequestMethod:" + e.toString());
         }
 
     }
 
-    static void setVerifySSL(HttpURLConnection urlConnection, String sslFilename) {
+    static void setVerifySSL(final HttpURLConnection urlConnection, final String sslFilename) {
         if(!(urlConnection instanceof HttpsURLConnection))
             return;
 
 
-        HttpsURLConnection httpsURLConnection = (HttpsURLConnection)urlConnection;
+        final HttpsURLConnection httpsURLConnection = (HttpsURLConnection)urlConnection;
 
         try {
             InputStream caInput = null;
+            String assetString = "@assets/";
+            String cachesString = "@caches/";
             if (sslFilename.startsWith("/")) {
                 caInput = new BufferedInputStream(new FileInputStream(sslFilename));
-            }else {
-                String assetString = "assets/";
+            }else if(sslFilename.startsWith(assetString)){
                 String assetsfilenameString = sslFilename.substring(assetString.length());
-                caInput = new BufferedInputStream(Cocos2dxHelper.getActivity().getAssets().open(assetsfilenameString));
+                assetsfilenameString = Utils.mingameSourceJoinPath(SharedVisit.gameActivity, assetsfilenameString);
+                FileInputStream fs = new FileInputStream(assetsfilenameString);
+                caInput = new BufferedInputStream(fs);
+            } else if (sslFilename.startsWith(cachesString)) {
+                String filenameString = sslFilename.substring(cachesString.length());
+                filenameString = Utils.mingameCacheJoinPath(SharedVisit.gameActivity, filenameString);
+                FileInputStream fs = new FileInputStream(filenameString);
+                caInput = new BufferedInputStream(fs);
             }
 
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            final CertificateFactory cf = CertificateFactory.getInstance("X.509");
             Certificate ca;
             ca = cf.generateCertificate(caInput);
             System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
             caInput.close();
 
             // Create a KeyStore containing our trusted CAs
-            String keyStoreType = KeyStore.getDefaultType();
-            KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+            final String keyStoreType = KeyStore.getDefaultType();
+            final KeyStore keyStore = KeyStore.getInstance(keyStoreType);
             keyStore.load(null, null);
             keyStore.setCertificateEntry("ca", ca);
 
             // Create a TrustManager that trusts the CAs in our KeyStore
-            String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+            final String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+            final TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
             tmf.init(keyStore);
 
             // Create an SSLContext that uses our TrustManager
-            SSLContext context = SSLContext.getInstance("TLS");
+            final SSLContext context = SSLContext.getInstance("TLS");
             context.init(null, tmf.getTrustManagers(), null);
 
             httpsURLConnection.setSSLSocketFactory(context.getSocketFactory());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             Log.e(TAG, "setVerifySSL:" + e.toString());
         }
     }
 
     //Add header
-    static void addRequestHeader(HttpURLConnection urlConnection, String key, String value) {
+    static void addRequestHeader(final HttpURLConnection urlConnection, final String key, final String value) {
         urlConnection.setRequestProperty(key, value);
     }
 
-    static int connect(HttpURLConnection http) {
+    static int connect(final HttpURLConnection http) {
         int suc = 0;
 
         try {
             http.connect();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             Log.e(TAG, "connect" + e.toString());
             suc = 1;
@@ -159,34 +167,34 @@ public class Cocos2dxHttpURLConnection
         return suc;
     }
 
-    static void disconnect(HttpURLConnection http) {
+    static void disconnect(final HttpURLConnection http) {
         http.disconnect();
     }
 
-    static void sendRequest(HttpURLConnection http, byte[] byteArray) {
+    static void sendRequest(final HttpURLConnection http, final byte[] byteArray) {
         try {
-            OutputStream out = http.getOutputStream();
+            final OutputStream out = http.getOutputStream();
             if(null !=  byteArray) {
                 out.write(byteArray);
                 out.flush();
             }
             out.close();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             Log.e(TAG, "sendRequest:" + e.toString());
         }
     }
 
-    static String getResponseHeaders(HttpURLConnection http) {
-        Map<String, List<String>> headers = http.getHeaderFields();
+    static String getResponseHeaders(final HttpURLConnection http) {
+        final Map<String, List<String>> headers = http.getHeaderFields();
         if (null == headers) {
             return null;
         }
 
         String header = "";
 
-        for (Entry<String, List<String>> entry: headers.entrySet()) {
-            String key = entry.getKey();
+        for (final Entry<String, List<String>> entry: headers.entrySet()) {
+            final String key = entry.getKey();
             if (null == key) {
                 header += listToString(entry.getValue(), ",") + "\n";
             } else {
@@ -197,8 +205,8 @@ public class Cocos2dxHttpURLConnection
         return header;
     }
 
-    static String getResponseHeaderByIdx(HttpURLConnection http, int idx) {
-        Map<String, List<String>> headers = http.getHeaderFields();
+    static String getResponseHeaderByIdx(final HttpURLConnection http, final int idx) {
+        final Map<String, List<String>> headers = http.getHeaderFields();
         if (null == headers) {
             return null;
         }
@@ -206,9 +214,9 @@ public class Cocos2dxHttpURLConnection
         String header = null;
 
         int counter = 0;
-        for (Entry<String, List<String>> entry: headers.entrySet()) {
+        for (final Entry<String, List<String>> entry: headers.entrySet()) {
             if (counter == idx) {
-                String key = entry.getKey();
+                final String key = entry.getKey();
                 if (null == key) {
                     header = listToString(entry.getValue(), ",") + "\n";
                 } else {
@@ -222,19 +230,19 @@ public class Cocos2dxHttpURLConnection
         return header;
     }
 
-    static String getResponseHeaderByKey(HttpURLConnection http, String key) {
+    static String getResponseHeaderByKey(final HttpURLConnection http, final String key) {
         if (null == key) {
             return null;
         }
 
-        Map<String, List<String>> headers = http.getHeaderFields();
+        final Map<String, List<String>> headers = http.getHeaderFields();
         if (null == headers) {
             return null;
         }
 
         String header = null;
 
-        for (Entry<String, List<String>> entry: headers.entrySet()) {
+        for (final Entry<String, List<String>> entry: headers.entrySet()) {
             if (key.equalsIgnoreCase(entry.getKey())) {
                 if ("set-cookie".equalsIgnoreCase(key)) {
                     header = combinCookies(entry.getValue(), http.getURL().getHost());
@@ -248,8 +256,8 @@ public class Cocos2dxHttpURLConnection
         return header;
     }
 
-    static int getResponseHeaderByKeyInt(HttpURLConnection http, String key) {
-        String value = http.getHeaderField(key);
+    static int getResponseHeaderByKeyInt(final HttpURLConnection http, final String key) {
+        final String value = http.getHeaderField(key);
 
         if (null == value) {
             return 0;
@@ -258,11 +266,11 @@ public class Cocos2dxHttpURLConnection
         }
     }
 
-    static byte[] getResponseContent(HttpURLConnection http) {
+    static byte[] getResponseContent(final HttpURLConnection http) {
         InputStream in;
         try {
             in = http.getInputStream();
-            String contentEncoding = http.getContentEncoding();
+            final String contentEncoding = http.getContentEncoding();
             if (contentEncoding != null) {
                 if(contentEncoding.equalsIgnoreCase("gzip")){
                     in = new GZIPInputStream(http.getInputStream()); //reads 2 bytes to determine GZIP stream!
@@ -271,26 +279,26 @@ public class Cocos2dxHttpURLConnection
                     in = new InflaterInputStream(http.getInputStream());
                 }
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             in = http.getErrorStream();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             Log.e(TAG, "1 getResponseContent: " + e.toString());
             return null;
         }
 
         try {
-            byte[] buffer = new byte[1024];
+            final byte[] buffer = new byte[1024];
             int size   = 0;
-            ByteArrayOutputStream bytestream = new ByteArrayOutputStream();
+            final ByteArrayOutputStream bytestream = new ByteArrayOutputStream();
             while((size = in.read(buffer, 0 , 1024)) != -1)
             {
                 bytestream.write(buffer, 0, size);
             }
-            byte retbuffer[] = bytestream.toByteArray();
+            final byte retbuffer[] = bytestream.toByteArray();
             bytestream.close();
             return retbuffer;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             Log.e(TAG, "2 getResponseContent:" + e.toString());
         }
@@ -298,22 +306,22 @@ public class Cocos2dxHttpURLConnection
         return null;
     }
 
-    static int getResponseCode(HttpURLConnection http) {
+    static int getResponseCode(final HttpURLConnection http) {
         int code = 0;
         try {
             code = http.getResponseCode();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             Log.e(TAG, "getResponseCode:" + e.toString());
         }
         return code;
     }
 
-    static String getResponseMessage(HttpURLConnection http) {
+    static String getResponseMessage(final HttpURLConnection http) {
         String msg;
         try {
             msg = http.getResponseMessage();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             msg = e.toString();
             Log.e(TAG, "getResponseMessage: " + msg);
@@ -322,11 +330,11 @@ public class Cocos2dxHttpURLConnection
         return msg;
     }
 
-    public static String listToString(List<String> list, String strInterVal) {
+    public static String listToString(final List<String> list, final String strInterVal) {
         if (list == null) {
             return null;
         }
-        StringBuilder result = new StringBuilder();
+        final StringBuilder result = new StringBuilder();
         boolean flag = false;
         for (String str : list) {
             if (flag) {
@@ -341,23 +349,23 @@ public class Cocos2dxHttpURLConnection
         return result.toString();
     }
 
-    public static String combinCookies(List<String> list, String hostDomain) {
-        StringBuilder sbCookies = new StringBuilder();
+    public static String combinCookies(final List<String> list, final String hostDomain) {
+        final StringBuilder sbCookies = new StringBuilder();
         String domain    = hostDomain;
-        String tailmatch = "FALSE";
+        final String tailmatch = "FALSE";
         String path      = "/";
         String secure    = "FALSE";
         String key = null;
         String value = null;
         String expires = null;
-        for (String str : list) {
-            String[] parts = str.split(";");
-            for (String part : parts) {
-                int firstIndex = part.indexOf("=");
+        for (final String str : list) {
+            final String[] parts = str.split(";");
+            for (final String part : parts) {
+                final int firstIndex = part.indexOf("=");
                 if (-1 == firstIndex)
                     continue;
 
-                String[] item =  {part.substring(0, firstIndex), part.substring(firstIndex + 1)};
+                final String[] item =  {part.substring(0, firstIndex), part.substring(firstIndex + 1)};
                 if ("expires".equalsIgnoreCase(item[0].trim())) {
                     expires = str2Seconds(item[1].trim());
                 } else if("path".equalsIgnoreCase(item[0].trim())) {
@@ -397,14 +405,14 @@ public class Cocos2dxHttpURLConnection
         return sbCookies.toString();
     }
 
-    private static String str2Seconds(String strTime) {
-        Calendar c = Calendar.getInstance();
+    private static String str2Seconds(final String strTime) {
+        final Calendar c = Calendar.getInstance();
         long milliseconds = 0;
 
         try {
             c.setTime(new SimpleDateFormat("EEE, dd-MMM-yy hh:mm:ss zzz", Locale.US).parse(strTime));
             milliseconds = c.getTimeInMillis() / 1000;
-        } catch (ParseException e) {
+        } catch (final ParseException e) {
             Log.e(TAG, "str2Seconds: " + e.toString());
         }
 

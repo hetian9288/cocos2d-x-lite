@@ -173,12 +173,17 @@ extern "C"
 	 * Cocos2dxRenderer native functions implementation.
 	 *****************************************************/
 
-    JNIEXPORT void JNICALL JNI_RENDER(nativeInit)(JNIEnv*  env, jobject thiz, jint w, jint h, jstring jDefaultResourcePath)
+    JNIEXPORT void JNICALL JNI_RENDER(nativeInit)(JNIEnv*  env, jobject thiz, jint w, jint h, jstring pass, jstring jDefaultResourcePath)
     {
         g_width = w;
         g_height = h;
+
+        // 销毁FileUtils单例
+        FileUtils::destroyInstance();
         
         g_app = cocos_android_app_init(env, w, h);
+        // 慧知科技
+        g_app->setPass(JniHelper::jstring2string(pass));
 
         g_isGameFinished = false;
         ccInvalidateStateCache();
@@ -464,7 +469,8 @@ extern "C"
         g_apkPath = JniHelper::jstring2string(apkPath);
     }
 
-    JNIEXPORT void JNICALL JNI_HELPER(nativeSetContext)(JNIEnv*  env, jobject thiz, jobject context, jobject assetManager)
+    
+    JNIEXPORT void JNICALL JNI_HELPER(nativeSetContext)(JNIEnv*  env, jobject thiz, jobject context)
     {
         JniHelper::setClassLoaderFrom(context);
         FileUtilsAndroid::setassetmanager(AAssetManager_fromJava(env, assetManager));
