@@ -280,7 +280,7 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
         assert pass != null;
         assert appid != null;
         Cocos2dxRenderer renderer = this.addSurfaceView();
-        renderer.setDefaultResourcePath(gamePath);
+        renderer.setDefaultRootPath(gamePath);
         renderer.setPass(pass);
         this.addDebugInfo(renderer);
 

@@ -53,7 +53,7 @@ public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
     private int mScreenHeight;
     private boolean mNativeInitCompleted = false;
     private boolean mNeedShowFPS = false;
-    private String mDefaultResourcePath = "";
+    private String mDefaultRootPath = "";
     private long mOldNanoTime = 0;
     private long mFrameCount = 0;
     private boolean mNeedToPause = false;
@@ -88,10 +88,10 @@ public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
         this.mScreenHeight = surfaceHeight;
     }
 
-    public void setDefaultResourcePath(String path) {
+    public void setDefaultRootPath(String path) {
         if (path == null)
             return;
-        mDefaultResourcePath = path;
+        mDefaultRootPath = path;
     }
 
     public void showFPS() {
