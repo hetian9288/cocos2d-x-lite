@@ -991,22 +991,48 @@ SE_BIND_FUNC(js_engine_FileUtils_getSearchResolutionsOrder)
 
 static bool js_engine_FileUtils_createDirectory(se::State &s)
 {
-    // 慧知科技 取消
-    // cocos2d::FileUtils* cobj = (cocos2d::FileUtils*)s.nativeThisObject();
-    // SE_PRECONDITION2(cobj, false, "js_engine_FileUtils_createDirectory : Invalid Native Object");
-    // const auto& args = s.args();
-    // size_t argc = args.size();
-    // CC_UNUSED bool ok = true;
-    // if (argc == 1) {
-    //     std::string arg0;
-    //     ok &= seval_to_std_string(args[0], &arg0);
-    //     SE_PRECONDITION2(ok, false, "js_engine_FileUtils_createDirectory : Error processing arguments");
-    //     bool result = cobj->createDirectory(arg0);
-    //     ok &= boolean_to_seval(result, &s.rval());
-    //     SE_PRECONDITION2(ok, false, "js_engine_FileUtils_createDirectory : Error processing arguments");
-    //     return true;
-    // }
-    // SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+    cocos2d::FileUtils* cobj = (cocos2d::FileUtils*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_engine_FileUtils_createDirectory : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1) {
+        std::string arg0;
+        ok &= seval_to_std_string(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_engine_FileUtils_createDirectory : Error processing arguments");
+
+        // 慧知科技 小游戏私有目录处理
+        // 1、文件路径必须是 @assets/ 或者 @caches/ 开头访问
+        std::string newFullPath = arg0;
+        if (newFullPath[0] == '/')
+        {
+            CCLOG("writeDataToFile 不支持绝对路径访问");
+            return false;
+        }
+        if (newFullPath.find("@assets/") == 0)
+        {
+            newFullPath = cobj->normalizePath(cobj->getDefaultSourceRootPath() + newFullPath.substr(strlen("@assets/")));
+        }
+        else if (newFullPath.find("@caches/") == 0)
+        {
+            newFullPath = cobj->normalizePath(cobj->getDefaultCachesRootPath() + newFullPath.substr(strlen("@caches/")));
+        }
+        else
+        {
+            return false;
+        }
+
+        if (newFullPath.empty())
+        {
+            return false;
+        }
+
+        bool result = cobj->createDirectory(newFullPath);
+        ok &= boolean_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_engine_FileUtils_createDirectory : Error processing arguments");
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
 SE_BIND_FUNC(js_engine_FileUtils_createDirectory)
