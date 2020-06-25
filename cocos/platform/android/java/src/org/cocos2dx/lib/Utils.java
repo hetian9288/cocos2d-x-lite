@@ -24,8 +24,11 @@
 package org.cocos2dx.lib;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Build;
 import android.view.View;
+
+import java.io.File;
 
 public class Utils {
     private static Activity sActivity = null;
