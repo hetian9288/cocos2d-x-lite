@@ -71,7 +71,6 @@ FileUtils *FileUtils::getInstance()
         {
             delete s_sharedFileUtils;
             s_sharedFileUtils = nullptr;
-            CCLOG("ERROR: Could not init CCFileUtilsAndroid");
         }
     }
     return s_sharedFileUtils;
@@ -197,20 +196,19 @@ bool FileUtilsAndroid::isFileExistInternal(const std::string &strFilePath) const
         const char *str = strFilePath.c_str();
 
         std::string newFilePath;
-        if (dirPath.find(ASSETS_FOLDER_NAME) == 0)
+        if (strFilePath.find(ASSETS_FOLDER_NAME) == 0)
         {
             str += strlen(ASSETS_FOLDER_NAME);
-            newFilePath = FileUtils::normalizePath(_defaultSourceRootPath + '/' + str);
+            newFilePath = FileUtils::normalizePath(_defaultSourceRootPath + str);
         }
-        else if (dirPath.find(CACHES_FOLDER_NAME) == 0)
+        else if (strFilePath.find(CACHES_FOLDER_NAME) == 0)
         {
             str += strlen(CACHES_FOLDER_NAME);
-            newFilePath = FileUtils::normalizePath(_defaultCachesRootPath + '/' + str);
+            newFilePath = FileUtils::normalizePath(_defaultCachesRootPath + str);
         }
-
         if (!newFilePath.empty())
         {
-            FILE *fp = fopen(strFilePath.c_str(), "r");
+            FILE *fp = fopen(newFilePath.c_str(), "r");
             if (fp)
             {
                 bFound = true;
@@ -246,7 +244,6 @@ bool FileUtilsAndroid::isDirectoryExistInternal(const std::string &dirPath_) con
     // find absolute path in flash memory
     if (dirPath[0] == '/')
     {
-        CCLOG("find in flash memory dirPath(%s)", dirPath.c_str());
         struct stat st;
         if (stat(dirPath.c_str(), &st) == 0)
         {
@@ -257,9 +254,8 @@ bool FileUtilsAndroid::isDirectoryExistInternal(const std::string &dirPath_) con
     {
         // find it in apk's assets dir
         // Found "@assets/" at the beginning of the path and we don't want it
-        CCLOG("find in apk dirPath(%s)", dirPath.c_str());
 
-        const char *str = strFilePath.c_str();
+        const char *str = dirPath.c_str();
 
         std::string newFilePath;
         if (dirPath.find(ASSETS_FOLDER_NAME) == 0)
@@ -326,6 +322,7 @@ FileUtils::Status FileUtilsAndroid::getContents(const std::string &filename, Res
         str += strlen(CACHES_FOLDER_NAME);
         absolutePath = FileUtils::normalizePath(_defaultCachesRootPath + "/" + str);
     }
+
 
     if (!absolutePath.empty())
     {

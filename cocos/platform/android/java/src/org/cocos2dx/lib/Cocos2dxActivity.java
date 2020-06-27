@@ -275,13 +275,7 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
         mFrameLayout = new FrameLayout(this);
         mFrameLayout.setLayoutParams(frameLayoutParams);
 
-        // 慧知科技 整合配置
-        assert gamePath != null;
-        assert pass != null;
-        assert appid != null;
         Cocos2dxRenderer renderer = this.addSurfaceView();
-        renderer.setDefaultRootPath(gamePath);
-        renderer.setPass(pass);
         this.addDebugInfo(renderer);
 
 
@@ -348,6 +342,7 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
     protected void onCreate(final Bundle savedInstanceState) {
         Log.d(TAG, "Cocos2dxActivity onCreate: " + this + ", savedInstanceState: " + savedInstanceState);
         super.onCreate(savedInstanceState);
+        SharedVisit.gameActivity = this;
 
         // Workaround in https://stackoverflow.com/questions/16283079/re-launch-of-activity-on-home-button-but-only-the-first-time/16447508
         if (!isTaskRoot()) {
@@ -496,7 +491,15 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
         if (isAndroidEmulator())
             this.mGLSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
 
+        
+        // 慧知科技 整合配置
+        assert gamePath != null;
+        assert pass != null;
+        assert appid != null;
+
         Cocos2dxRenderer renderer = new Cocos2dxRenderer();
+        renderer.setDefaultRootPath(gamePath);
+        renderer.setPass(pass);
         this.mGLSurfaceView.setCocos2dxRenderer(renderer);
 
         mFrameLayout.addView(this.mGLSurfaceView);
