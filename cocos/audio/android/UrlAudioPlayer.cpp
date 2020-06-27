@@ -212,6 +212,7 @@ void UrlAudioPlayer::play()
     }
     else
     {
+        ALOGW("UrlAudioPlayer play3!");
         ALOGW("UrlAudioPlayer (%p, state:%d) isn't paused or initialized, could not invoke play!", this, static_cast<int>(_state));
     }
 }

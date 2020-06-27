@@ -46,11 +46,11 @@ static bool js_engine_FileUtils_fullPathForFilename(se::State &s)
         // 慧知科技 新增对私有目录的拦截保护
         if (result.find(cobj->getDefaultCachesRootPath()) == 0)
         {
-            result = "@caches/" + result.substr(strlen(cobj->getDefaultCachesRootPath()));
+            result = "@caches/" + result.substr(cobj->getDefaultCachesRootPath().size());
         }
-        else if (result.find(cobj->getDefaultCachesRootPath() == 0))
+        else if (0 == result.find(cobj->getDefaultCachesRootPath()))
         {
-            result = "@assets/" + result.substr(strlen(cobj->getDefaultCachesRootPath()));
+            result = "@assets/" + result.substr(cobj->getDefaultCachesRootPath().size());
         }
         else
         {
@@ -121,7 +121,7 @@ static bool js_engine_FileUtils_removeFile(se::State &s)
         }
         else
         {
-            SE_REPORT_ERROR("未找到文件 %s", arg0);
+            SE_REPORT_ERROR("未找到文件 %s", arg0.c_str());
             return false;
         }
 
@@ -519,16 +519,16 @@ static bool js_engine_FileUtils_getFileSize(se::State &s)
         SE_PRECONDITION2(ok, false, "js_engine_FileUtils_getFileSize : Error processing arguments");
         if (arg0[0] == '/')
         {
-            SE_REPORT_ERROR("不允许访问原生绝对路径, arg0: %s", arg0);
+            SE_REPORT_ERROR("不允许访问原生绝对路径, arg0: %s", arg0.c_str());
             return false;
         }
         else if (arg0.find("@assets/") == 0)
         {
-            arg0 = arg0.substr(strlen("@assets/"))
+            arg0 = arg0.substr(strlen("@assets/"));
         }
         else if (arg0.find("@caches/") == 0)
         {
-            arg0 = arg0.substr(strlen("@caches/"))
+            arg0 = arg0.substr(strlen("@caches/"));
         }
         long result = cobj->getFileSize(arg0);
         ok &= long_to_seval(result, &s.rval());
@@ -599,7 +599,7 @@ static bool js_engine_FileUtils_removeDirectory(se::State &s)
         }
         else
         {
-            SE_REPORT_ERROR("removeDirectory禁止访问 %s", arg0);
+            SE_REPORT_ERROR("removeDirectory禁止访问 %s", arg0.c_str());
             return false;
         }
         bool result = cobj->removeDirectory(arg0);
@@ -1039,6 +1039,7 @@ SE_BIND_FUNC(js_engine_FileUtils_createDirectory)
 
 static bool js_engine_FileUtils_getWritablePath(se::State &s)
 {
+    CC_UNUSED bool ok = true;
     ok &= std_string_to_seval("@caches/", &s.rval());
     SE_PRECONDITION2(ok, false, "js_engine_FileUtils_getWritablePath : Error processing arguments");
     return true;
