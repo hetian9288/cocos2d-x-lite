@@ -71,14 +71,7 @@ public class Utils {
 
     // 生成小游戏的根目录路径
     public static File getMingameRootPath(Context context, String appid) {
-        String path = context.getFilesDir().getAbsolutePath();
-        int lastSlash = path.lastIndexOf("/");
-        String rootPath = path.substring(0, lastSlash + 1);
-        File rootDir = new File(rootPath + "/plugins/mingame/" + appid);
-        if (!rootDir.exists()) {
-            rootDir.mkdirs();
-        }
-        return rootDir;
+        return new File(SharedVisit.getRootPath(appid));
     }
 
     // 在小游戏的根目录下生成一个目录
@@ -111,10 +104,17 @@ public class Utils {
 
     public static String mingameSourceJoinPath(Cocos2dxActivity context, String path) {
         String sourcePath = mingamePathMkdir(context, "source").getAbsolutePath();
+        String toPath;
         if (path.startsWith("/")) {
-            return sourcePath + path;
+            toPath = sourcePath + path;
+        }else {
+            toPath = sourcePath + "/" + path;
         }
-        return sourcePath + "/" + path;
+        File pathFile = new File(toPath);
+        if (!pathFile.exists()) {
+            pathFile.mkdirs();
+        }
+        return pathFile.getAbsolutePath();
     }
 
     // 源码目录创建文件夹
@@ -166,10 +166,17 @@ public class Utils {
 
     public static String mingameCacheJoinPath(Cocos2dxActivity context, String path) {
         String cachePath = mingameCachePath(context).getAbsolutePath();
+        String toPath;
         if (path.startsWith("/")) {
-            return cachePath + path;
+            toPath = cachePath + path;
+        } else {
+            toPath = cachePath + "/" + path;
         }
-        return cachePath + "/" + path;
+        File pathFile = new File(toPath);
+        if (!pathFile.exists()) {
+            pathFile.mkdirs();
+        }
+        return pathFile.getAbsolutePath();
     }
 
     // 小程序数据目录
