@@ -113,6 +113,15 @@ public class Cocos2dxDownloader {
     public static void createTask(final Cocos2dxDownloader downloader, int id_, String url_, String path_, String []header_) {
         final int id = id_;
         final String url = url_;
+        if (path_.startsWith("/")) {
+            return ;
+        } else if (path_.startsWith("@assets/")) {
+            path_ = Utils.mingameSourceJoinPath(SharedVisit.gameActivity, path_.substring("@assets/".length()));
+        } else if (path_.startsWith("@caches/")) {
+            path_ = Utils.mingameCacheJoinPath(SharedVisit.gameActivity, path_.substring("@caches/".length()));
+        } else {
+            path_ = Utils.mingameSourceJoinPath(SharedVisit.gameActivity, path_);
+        }
         final String path = path_;
         final String[] header = header_;
 
