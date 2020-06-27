@@ -482,7 +482,7 @@ static bool JavaScriptJavaBridge_callStaticMethod(se::State& s)
     std::string publicClass[] = {
         "info.huizhi.mingame.javascript",
         "com/cocos/analytics",
-    }
+    };
     
     if (argc == 3)
     {
