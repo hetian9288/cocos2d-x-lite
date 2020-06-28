@@ -110,11 +110,7 @@ public class Utils {
         }else {
             toPath = sourcePath + "/" + path;
         }
-        File pathFile = new File(toPath);
-        if (!pathFile.exists()) {
-            pathFile.mkdirs();
-        }
-        return pathFile.getAbsolutePath();
+        return toPath;
     }
 
     // 源码目录创建文件夹
@@ -172,11 +168,7 @@ public class Utils {
         } else {
             toPath = cachePath + "/" + path;
         }
-        File pathFile = new File(toPath);
-        if (!pathFile.exists()) {
-            pathFile.mkdirs();
-        }
-        return pathFile.getAbsolutePath();
+        return toPath;
     }
 
     // 小程序数据目录

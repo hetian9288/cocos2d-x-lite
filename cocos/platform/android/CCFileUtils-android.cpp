@@ -191,6 +191,7 @@ bool FileUtilsAndroid::isFileExistInternal(const std::string &strFilePath) const
     //     }
     // }
     // 慧知科技添加 对@assets/ @caches/ 的处理
+    CCLOG("isFileExistInternal: %s", strFilePath.c_str());
     if (strFilePath[0] != '/')
     {
         const char *str = strFilePath.c_str();
@@ -206,6 +207,7 @@ bool FileUtilsAndroid::isFileExistInternal(const std::string &strFilePath) const
             str += strlen(CACHES_FOLDER_NAME);
             newFilePath = FileUtils::normalizePath(_defaultCachesRootPath + str);
         }
+        CCLOG("isFileExistInternal: %s", newFilePath.c_str());
         if (!newFilePath.empty())
         {
             FILE *fp = fopen(newFilePath.c_str(), "r");

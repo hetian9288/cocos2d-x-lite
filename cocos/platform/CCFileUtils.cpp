@@ -854,6 +854,21 @@ std::string FileUtils::fullPathForFilename(const std::string &filename) const
 
     std::string fullpath;
 
+    // 慧知科技 对前缀路径直接处理
+    if (newFilename[0] == '@') {
+        if (newFilename.find("@assets/") == 0) {
+            fullpath = this->getPathForFilename(newFilename.substr(strlen("@assets/")), "", "@assets/");
+        } else if (newFilename.find("@caches/") == 0) {
+            fullpath = this->getPathForFilename(newFilename.substr(strlen("@caches/")), "", "@caches/");
+        }
+        if (!fullpath.empty())
+        {
+            // Using the filename passed in as key.
+            _fullPathCache.insert(std::make_pair(filename, fullpath));
+            return fullpath;
+        }
+    }
+
     for (const auto &searchIt : _searchPathArray)
     {
         for (const auto &resolutionIt : _searchResolutionsOrderArray)
