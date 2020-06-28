@@ -54,6 +54,7 @@ import org.cocos2dx.okhttp3.Response;
 
 public class Cocos2dxDownloader {
 
+    private static final String TAG = "Cocos2dxDownloader";
     private int _id;
     private OkHttpClient _httpClient = null;
 
@@ -113,6 +114,18 @@ public class Cocos2dxDownloader {
     public static void createTask(final Cocos2dxDownloader downloader, int id_, String url_, String path_, String []header_) {
         final int id = id_;
         final String url = url_;
+        Log.i(TAG, "createTask: " + path_);
+        if (path_.startsWith("/")) {
+            return ;
+        } else if (path_.startsWith("@assets/")) {
+            path_ = Utils.mingameSourceJoinPath(SharedVisit.gameActivity, path_.substring("@assets/".length()));
+        } else if (path_.startsWith("@caches/")) {
+            path_ = Utils.mingameCacheJoinPath(SharedVisit.gameActivity, path_.substring("@caches/".length()));
+        } else {
+            path_ = Utils.mingameSourceJoinPath(SharedVisit.gameActivity, path_);
+        }
+        Log.i(TAG, "createTask: " + path_);
+        Log.i(TAG, "createTask: " + url_);
         final String path = path_;
         final String[] header = header_;
 
@@ -126,7 +139,6 @@ public class Cocos2dxDownloader {
             @Override
             public void run() {
                 Call task = null;
-
                 do {
                     if (path.length() > 0) {
                         try {
@@ -192,7 +204,7 @@ public class Cocos2dxDownloader {
                             FileOutputStream fos = null;
 
                             try {
-
+                                Log.i(TAG, "onResponse: " + response.code());
                                 if(!(response.code() >= 200 && response.code() <= 206)) {
                                     downloader.onFinish(id, -2, response.message(), null);
                                     return;
@@ -224,7 +236,8 @@ public class Cocos2dxDownloader {
                                         downloader.onProgress(id, len, current, total);
                                     }
                                     fos.flush();
-
+                                    Log.i(TAG, "onResponse: " + tempFile.getAbsolutePath());
+                                    Log.i(TAG, "onResponse: " + finalFile.getAbsolutePath());
                                     String errStr = null;
                                     do {
                                         // rename temp file to final file, if final file exist, remove it

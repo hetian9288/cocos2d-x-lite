@@ -353,18 +353,19 @@ namespace cocos2d
     AudioPlayerProvider::AudioFileInfo AudioPlayerProvider::getFileInfo(
         const std::string &audioFilePath)
     {
+        std::string audioPath = audioFilePath;
         AudioFileInfo info;
         long fileSize = 0;
         off_t start = 0, length = 0;
         int assetFd = -1;
-
         if (audioFilePath[0] != '/')
         {
             // 慧知科技 更改为直接从资源目录读取
             if (audioFilePath.find("@assets/") == 0)
             {
                 std::string relativePath = audioFilePath.substr(strlen("@assets/"));
-                std::string absolutePath = FileUtils::getInstance()->getDefaultSourceRootPath() + "/" + relativePath;
+                std::string absolutePath = FileUtils::getInstance()->getDefaultSourceRootPath() + relativePath;
+                audioPath = absolutePath;
                 FILE *fp = fopen(absolutePath.c_str(), "rb");
                 if (fp != nullptr)
                 {
@@ -380,7 +381,8 @@ namespace cocos2d
             else if (audioFilePath.find("@caches/") == 0)
             {
                 std::string relativePath = audioFilePath.substr(strlen("@caches/"));
-                std::string absolutePath = FileUtils::getInstance()->getDefaultCachesRootPath() + "/" + relativePath;
+                std::string absolutePath = FileUtils::getInstance()->getDefaultCachesRootPath() + relativePath;
+                audioPath = absolutePath;
                 FILE *fp = fopen(absolutePath.c_str(), "rb");
                 if (fp != nullptr)
                 {
@@ -400,7 +402,7 @@ namespace cocos2d
         }
         else
         {
-            FILE *fp = fopen(audioFilePath.c_str(), "rb");
+            FILE *fp = fopen(audioPath.c_str(), "rb");
             if (fp != nullptr)
             {
                 fseek(fp, 0, SEEK_END);
@@ -413,7 +415,7 @@ namespace cocos2d
             }
         }
 
-        info.url = audioFilePath;
+        info.url = audioPath;
         info.assetFd = std::make_shared<AssetFd>(assetFd);
         info.start = start;
         info.length = fileSize;

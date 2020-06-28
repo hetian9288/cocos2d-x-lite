@@ -98,7 +98,6 @@ static int fdGetter(const std::string &url, off_t *start, off_t *length)
     // open asset as file descriptor
     fd = AAsset_openFileDescriptor(asset, start, length);
     AAsset_close(asset);
-    fd.close();
 
     if (fd <= 0)
     {
@@ -221,6 +220,7 @@ int AudioEngineImpl::play2d(const std::string &filePath, bool loop, float volume
             _audioPlayers.insert(std::make_pair(audioId, player));
 
             player->setPlayEventCallback([this, player, filePath](IAudioPlayer::State state) {
+                CCLOG("play2d state: %d", static_cast<int>(state));
                 if (state != IAudioPlayer::State::OVER && state != IAudioPlayer::State::STOPPED)
                 {
                     ALOGV("Ignore state: %d", static_cast<int>(state));

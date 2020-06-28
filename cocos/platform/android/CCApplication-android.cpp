@@ -126,13 +126,13 @@ void Application::end()
 // 慧知科技
 void Application::setPass(const std::string& pass)
 {
-    this._pass = pass;
+    _pass = pass;
 }
 
 // 慧知科技
 std::string Application::getPass()
 {
-    return this._pass;
+    return _pass;
 }
 
 void Application::setMultitouch(bool /*value*/)

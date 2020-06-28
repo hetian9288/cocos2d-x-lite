@@ -53,7 +53,7 @@ public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
     private int mScreenHeight;
     private boolean mNativeInitCompleted = false;
     private boolean mNeedShowFPS = false;
-    private String mDefaultResourcePath = "";
+    private String mDefaultRootPath = "";
     private long mOldNanoTime = 0;
     private long mFrameCount = 0;
     private boolean mNeedToPause = false;
@@ -88,10 +88,10 @@ public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
         this.mScreenHeight = surfaceHeight;
     }
 
-    public void setDefaultResourcePath(String path) {
+    public void setDefaultRootPath(String path) {
         if (path == null)
             return;
-        mDefaultResourcePath = path;
+        mDefaultRootPath = path;
     }
 
     public void showFPS() {
@@ -115,7 +115,7 @@ public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceCreated(final GL10 GL10, final EGLConfig EGLConfig) {
         mNativeInitCompleted = false;
-        Cocos2dxRenderer.nativeInit(this.mScreenWidth, this.mScreenHeight, pass, mDefaultResourcePat);
+        Cocos2dxRenderer.nativeInit(this.mScreenWidth, this.mScreenHeight, pass, mDefaultRootPath);
         mOldNanoTime = System.nanoTime();
         this.mLastTickInNanoSeconds = System.nanoTime();
         mNativeInitCompleted = true;
@@ -190,7 +190,7 @@ public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
     private static native void nativeTouchesCancel(final int[] ids, final float[] xs, final float[] ys);
     private static native boolean nativeKeyEvent(final int keyCode,boolean isPressed);
     private static native void nativeRender();
-    private static native void nativeInit(final int width, final int height, final String resourcePath);
+    private static native void nativeInit(final int width, final int height, final String pass, final String resourcePath);
     private static native void nativeOnSurfaceChanged(final int width, final int height);
     private static native void nativeOnPause();
     private static native void nativeOnResume();

@@ -692,10 +692,14 @@ FileUtils::Status FileUtils::getContents(const std::string &filename, ResizableB
         return Status::NotExists;
 
     auto fs = FileUtils::getInstance();
-
-    std::string fullPath = fs->fullPathForFilename(filename);
-    if (fullPath.empty())
-        return Status::NotExists;
+    std::string fullPath;
+    if (filename[0] != '/') {
+        fullPath = fs->fullPathForFilename(filename);
+        if (fullPath.empty())
+            return Status::NotExists;
+    } else {
+        fullPath = filename;
+    }
 
     FILE *fp = fopen(fs->getSuitableFOpen(fullPath).c_str(), "rb");
     if (!fp)
@@ -850,6 +854,21 @@ std::string FileUtils::fullPathForFilename(const std::string &filename) const
 
     std::string fullpath;
 
+    // 慧知科技 对前缀路径直接处理
+    if (newFilename[0] == '@') {
+        if (newFilename.find("@assets/") == 0) {
+            fullpath = this->getPathForFilename(newFilename.substr(strlen("@assets/")), "", "@assets/");
+        } else if (newFilename.find("@caches/") == 0) {
+            fullpath = this->getPathForFilename(newFilename.substr(strlen("@caches/")), "", "@caches/");
+        }
+        if (!fullpath.empty())
+        {
+            // Using the filename passed in as key.
+            _fullPathCache.insert(std::make_pair(filename, fullpath));
+            return fullpath;
+        }
+    }
+
     for (const auto &searchIt : _searchPathArray)
     {
         for (const auto &resolutionIt : _searchResolutionsOrderArray)
@@ -977,8 +996,8 @@ void FileUtils::setDefaultResourceRootPath(const std::string &path)
         _defaultRootPath = path;
         if (!_defaultRootPath.empty() && _defaultRootPath[_defaultRootPath.length() - 1] != '/')
         {
-            _defaultSourceRootPath = _defaultRootPath + '/source/';
-            _defaultCachesRootPath = _defaultRootPath + '/caches/';
+            _defaultSourceRootPath = _defaultRootPath + "/source/";
+            _defaultCachesRootPath = _defaultRootPath + "/caches/";
         }
 
         setSearchPaths(_originalSearchPaths);
@@ -1635,7 +1654,7 @@ std::string FileUtils::normalizePath(const std::string &path) const
     }
 
     // 慧知科技 如果替换完后路径中还存在 ../ 全部清除 避免访问非游戏的私有目录
-    if (ret.find("../") >= 0)
+    if (ret.find("../") > -1)
     {
         ret = std::regex_replace(ret, std::regex("\\.\\./"), "");
     }

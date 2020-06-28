@@ -479,12 +479,31 @@ static bool JavaScriptJavaBridge_callStaticMethod(se::State& s)
     const auto& args = s.args();
     int argc = (int)args.size();
 
+    std::string publicClass[] = {
+        "info.huizhi.mingame.javascript",
+        "com/cocos/analytics",
+    };
+    
     if (argc == 3)
     {
         bool ok = false;
         std::string clsName, methodName, methodSig;
         ok = seval_to_std_string(args[0], &clsName);
         SE_PRECONDITION2(ok, false, "Converting class name failed!");
+
+        // 慧知科技 拦截
+        bool pass = false;
+        for(const auto& iter : publicClass) {
+            std::string pathBefore = iter;
+            if (clsName.find(pathBefore) == 0) {
+                pass = true;
+                break;
+            }
+        }
+        if (!pass) {
+            SE_PRECONDITION2(ok, false, "不允许的原生访问类!");
+            return false;
+        }
 
         ok = seval_to_std_string(args[1], &methodName);
         SE_PRECONDITION2(ok, false, "Converting method name failed!");
@@ -514,6 +533,21 @@ static bool JavaScriptJavaBridge_callStaticMethod(se::State& s)
         std::string clsName, methodName, methodSig;
         ok = seval_to_std_string(args[0], &clsName);
         SE_PRECONDITION2(ok, false, "Converting class name failed!");
+
+        // 慧知科技 拦截
+        
+        bool pass = false;
+        for(const auto& iter : publicClass) {
+            std::string pathBefore = iter;
+            if (clsName.find(pathBefore) == 0) {
+                pass = true;
+                break;
+            }
+        }
+        if (!pass) {
+            SE_PRECONDITION2(ok, false, "不允许的原生访问类!");
+            return false;
+        }
 
         ok = seval_to_std_string(args[1], &methodName);
         SE_PRECONDITION2(ok, false, "Converting method name failed!");
