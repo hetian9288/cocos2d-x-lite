@@ -107,7 +107,7 @@ public class Utils {
         String toPath;
         if (path.startsWith("/")) {
             toPath = sourcePath + path;
-        }else {
+        } else {
             toPath = sourcePath + "/" + path;
         }
         return toPath;
@@ -197,5 +197,35 @@ public class Utils {
             return newDir;
         }
         return null;
+    }
+
+    // 清理缓存目录
+    public static void clearMingameCacheDir(Activity context, String appid) {
+        File rootDir = getMingameRootPath(context, appid);
+        File cacheDir = new File(rootDir, "caches");
+        if (cacheDir.exists()) {
+            deleteDir(cacheDir.getAbsolutePath());
+        }
+    }
+
+    private static void deleteDir(String path) {
+        File file = new File(path);
+        if (!file.exists()) {//判断是否待删除目录是否存在
+            System.err.println("The dir are not exists!");
+            return;
+        }
+
+        String[] content = file.list();//取得当前目录下所有文件和文件夹
+        for (String name : content) {
+            File temp = new File(path, name);
+            if (temp.isDirectory()) {//判断是否是目录
+                deleteDir(temp.getAbsolutePath());//递归调用，删除目录里的内容
+                temp.delete();//删除空目录
+            } else {
+                if (!temp.delete()) {//直接删除文件
+                    System.err.println("Failed to delete " + name);
+                }
+            }
+        }
     }
 }
