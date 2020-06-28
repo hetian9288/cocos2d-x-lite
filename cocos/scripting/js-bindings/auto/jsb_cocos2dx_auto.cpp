@@ -890,20 +890,21 @@ SE_BIND_FUNC(js_engine_FileUtils_getFileExtension)
 
 static bool js_engine_FileUtils_setWritablePath(se::State &s)
 {
-    cocos2d::FileUtils *cobj = (cocos2d::FileUtils *)s.nativeThisObject();
-    SE_PRECONDITION2(cobj, false, "js_engine_FileUtils_setWritablePath : Invalid Native Object");
-    const auto &args = s.args();
-    size_t argc = args.size();
-    CC_UNUSED bool ok = true;
-    if (argc == 1)
-    {
-        std::string arg0;
-        ok &= seval_to_std_string(args[0], &arg0);
-        SE_PRECONDITION2(ok, false, "js_engine_FileUtils_setWritablePath : Error processing arguments");
-        cobj->setWritablePath(arg0);
-        return true;
-    }
-    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+    // 慧知科技 清理
+    // cocos2d::FileUtils *cobj = (cocos2d::FileUtils *)s.nativeThisObject();
+    // SE_PRECONDITION2(cobj, false, "js_engine_FileUtils_setWritablePath : Invalid Native Object");
+    // const auto &args = s.args();
+    // size_t argc = args.size();
+    // CC_UNUSED bool ok = true;
+    // if (argc == 1)
+    // {
+    //     std::string arg0;
+    //     ok &= seval_to_std_string(args[0], &arg0);
+    //     SE_PRECONDITION2(ok, false, "js_engine_FileUtils_setWritablePath : Error processing arguments");
+    //     cobj->setWritablePath(arg0);
+    //     return true;
+    // }
+    // SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
 SE_BIND_FUNC(js_engine_FileUtils_setWritablePath)
